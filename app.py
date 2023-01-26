@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 import matplotlib 
 from io import BytesIO
 
+st.title('주식 정보 웹 앱')
+
 def get_stock_info(maket_type=None):
     base_url =  "http://kind.krx.co.kr/corpgeneral/corpList.do"    
     method = "download"
@@ -31,20 +33,20 @@ def get_ticker_symbol(company_name, maket_type):
         ticker_symbol = code +".KQ" 
     return ticker_symbol
 
-st.title('반도체 주식 데이터 Dashboard')
-# tickers =('TSLA','AAPL','MSFT','BTC-USD','ETH-USD','005930.KS')
-tickers ={
-  'SK hynix':'000660.KS',
-  'Samsung Electronics':'005930.KS',
-  'NVIDIA Corporation' :'NVDA',
-  'QUALCOMM':'QCOM'
-}
-reversed_ticker = dict(map(reversed,tickers.items()))
-dropdown = st.multiselect('select',tickers.keys())
+df = get_stock_info('kospi')
+df
+
+stock_name = st.sidebar.text_input("회사이름과 기간 입력", "NAVER")
+
+ticker_symbol = get_ticker_symbol(stock_name, "kospi")  
+ticker_data = yf.Ticker(ticker_symbol)
+
 start = st.date_input('Start', value=pd.to_datetime('2019-01-01'))
 end = st.date_input('End',value=pd.to_datetime('today'))
-if len(dropdown) > 0:
-  for i in dropdown:
-    df = yf.download(tickers[i],start,end)['Adj Close']
-    st.title(reversed_ticker[tickers[i]])
-    st.line_chart(df)
+
+df = ticker_data.history(start=start, end=end)
+df.index = df.index.date
+st.subheader(f"[{stock_name}] 주가 데이터")
+st.dataframe(df.head())
+
+st.line_chart(df['Close'])
