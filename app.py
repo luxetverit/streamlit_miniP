@@ -36,7 +36,7 @@ def get_ticker_symbol(company_name, maket_type):
 df = get_stock_info('kospi')
 df
 
-stock_name = st.sidebar.text_input("회사이름과 기간 입력", "NAVER")
+stock_name = st.sidebar.text_input("회사이름 입력", "NAVER")
 
 ticker_symbol = get_ticker_symbol(stock_name, "kospi")  
 ticker_data = yf.Ticker(ticker_symbol)
